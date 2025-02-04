@@ -1,36 +1,41 @@
-from bot_logic import gen_pass
 import discord
-# import * - es una forma rápida de importar todos los archivos de la biblioteca
+from discord.ext import commands
+from bot_logic import gen_pass
+from bot_logic import gen_emodji
+from bot_logic import flip_coin
 
-
-# La variable intents almacena los privilegios del bot
 intents = discord.Intents.default()
-# Activar el privilegio de lectura de mensajes
 intents.message_content = True
-# Crear un bot en la variable cliente y transferirle los privilegios
-client = discord.Client(intents=intents)
 
+bot = commands.Bot(command_prefix='$', intents=intents)
 
-# Una vez que el bot esté listo, ¡imprimirá su nombre!
-@client.event
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
+    print(f'We have logged in as {bot.user}')   
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f'Hola, soy un bot {bot.user}!')
+@bot.command()
+async def heh(ctx, count_heh = 5):
+    await ctx.send("he" * count_heh)
+@bot.command()
+async def clave(ctx ,count_pass=10):
+    await ctx.send(gen_pass(count_pass))
+@bot.command()
+async def emoji(ctx):
+    await ctx.send(gen_emodji())
+@bot.command()
+async def coin(ctx):
+    await ctx.send(flip_coin())        
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
+@bot.command()
+async def decir(ctx, palabra=''):
+    await ctx.send(palabra)
 
 
-# Cuando el bot reciba un mensaje, ¡enviará mensajes en el mismo canal!
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    if message.content.startswith('$hello'):
-        await message.channel.send('¡Hola! Soy un bot')
-    elif message.content.startswith('$pass'):
-        await message.channel.send(gen_pass(10))
-    elif message.content.startswith('$smile'):
-        await message.channel.send(gen_emodji())
-    elif message.content.startswith('$coin'):
-        await message.channel.send(flip_coin())    
-    else:
-        await message.channel.send(message.content)
+bot.run("Escribe aqui tu token")
 
-client.run("Escribe aqui tu token")
+
+
